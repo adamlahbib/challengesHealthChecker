@@ -69,7 +69,7 @@ const (
 	headerDelimiter   = ":"
 	prefix            = "/check"
 	connectionRefused = "connection refused"
-	responseMessage   = "Challenge `%v` is %s\n"
+	responseMessage   = "@here Challenge `%v` is %s\n"
 
 	up   = ":thumbsup:"
 	down = ":thumbsdown:"
@@ -152,13 +152,15 @@ func (c *Config) Loop(s *discordgo.Session) {
 
 			var message string
 			if res {
-				message = fmt.Sprintf(responseMessage, name, up)
+				// up, do nothing, used to be message = fmt.Sprintf(responseMessage, name, up)
 			} else {
 				message = fmt.Sprintf(responseMessage, name, down)
+				// the next two lines used to be after else.
+				log.Printf("Sending message: %v\n", message)
+				s.ChannelMessageSend("1089938713917796423", message)
 			}
 
-			log.Printf("Sending message: %v\n", message)
-			s.ChannelMessageSend("1089938713917796423", message)
+			
 		}
 		time.Sleep(5 * time.Minute)
 	}
