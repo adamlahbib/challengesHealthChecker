@@ -138,7 +138,10 @@ func (c *Config) Print() {
 }
 */
 func (c *Config) Loop(s *discordgo.Session) {
-	for {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		for name := range c.Challenges {
 			res, err := c.CheckSanity(name)
 			if err != nil {
@@ -159,10 +162,7 @@ func (c *Config) Loop(s *discordgo.Session) {
 				log.Printf("Sending message: %v\n", message)
 				s.ChannelMessageSend("1089938713917796423", message)
 			}
-
-			
 		}
-		time.Sleep(5 * time.Minute)
 	}
 }
 
