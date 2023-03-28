@@ -139,28 +139,31 @@ func (c *Config) Print() {
 */
 func (c *Config) Loop(s *discordgo.Session) {
 	ticker := time.NewTicker(5 * time.Minute)
-	defer ticker.Stop()
 
-	for range ticker.C {
-		for name := range c.Challenges {
-			res, err := c.CheckSanity(name)
-			if err != nil {
-				log.Printf("Failed to check health of %v: %v\n", name, err)
-				// Do not return for `connection refused` error
-				// `connection refused` indicates server is down
-				if !strings.Contains(err.Error(), connectionRefused) {
-					continue
+	for {
+		select {
+		case <-ticker.C:
+			for name := range c.Challenges {
+				res, err := c.CheckSanity(name)
+				if err != nil {
+					log.Printf("Failed to check health of %v: %v\n", name, err)
+					// Do not return for `connection refused` error
+					// `connection refused` indicates server is down
+					if !strings.Contains(err.Error(), connectionRefused) {
+						continue
+					}
 				}
-			}
 
-			var message string
-			if res {
-				// up, do nothing, used to be message = fmt.Sprintf(responseMessage, name, up)
-			} else {
-				message = fmt.Sprintf(responseMessage, name, down)
-				// the next two lines used to be after else.
-				log.Printf("Sending message: %v\n", message)
-				s.ChannelMessageSend("1089938713917796423", message)
+				var message string
+				if res {
+					// up, do nothing, used to be message = fmt.Sprintf(responseMessage, name, up)
+				} else {
+					message = fmt.Sprintf(responseMessage, name, down)
+					// the next two lines used to be after else.
+					log.Printf("Sending message: %v\n", message)
+					s.ChannelMessageSend("1089884138703700068", message)
+				}
+
 			}
 		}
 	}
